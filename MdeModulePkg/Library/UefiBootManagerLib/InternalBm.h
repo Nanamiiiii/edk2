@@ -72,6 +72,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PerformanceLib.h>
 #include <Library/HiiLib.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 #if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
   #if defined (MDE_CPU_EBC)
 //

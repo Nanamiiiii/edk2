@@ -28,6 +28,17 @@
 #include <Protocol/LoadFile2.h>
 #include <Protocol/SimpleFileSystem.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 //
 // Static data that hosts the fw_cfg blobs and serves file requests.
 //
@@ -1046,6 +1057,16 @@ QemuKernelLoaderFsDxeEntrypoint (
   EFI_HANDLE   FileSystemHandle;
   EFI_HANDLE   InitrdLoadFile2Handle;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   if (!QemuFwCfgIsAvailable ()) {
     return EFI_NOT_FOUND;
   }
@@ -1126,6 +1147,16 @@ QemuKernelLoaderFsDxeEntrypoint (
       goto UninstallFileSystemHandle;
     }
   }
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return EFI_SUCCESS;
 

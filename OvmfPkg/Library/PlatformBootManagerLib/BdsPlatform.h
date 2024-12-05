@@ -63,6 +63,17 @@ Abstract:
 
 #include <OvmfPlatforms.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 extern EFI_DEVICE_PATH_PROTOCOL  *gPlatformConnectSequence[];
 extern ACPI_HID_DEVICE_PATH      gPnpPs2KeyboardDeviceNode;
 extern ACPI_HID_DEVICE_PATH      gPnp16550ComPortDeviceNode;

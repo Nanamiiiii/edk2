@@ -24,12 +24,26 @@
 #include <ConfidentialComputingGuestAttr.h>
 #include <Library/TdxHelperLib.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/DebugLib.h>
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+/* OVMFPERF-MYUU END */
+
 #define ALIGNED_2MB_MASK  0x1fffff
 #define MEGABYTE_SHIFT    20
 
 #define ACCEPT_CHUNK_SIZE  SIZE_32MB
 #define AP_STACK_SIZE      SIZE_16KB
 #define APS_STACK_SIZE(CpusNum)  (ALIGN_VALUE(CpusNum*AP_STACK_SIZE, SIZE_2MB))
+
+/* OVMFPERF-MYUU BEGIN */
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
 
 /**
   Build the GuidHob for tdx measurements which were done in SEC phase.
@@ -778,6 +792,16 @@ TdxHelperProcessTdHob (
   VOID            *TdHob;
   TD_RETURN_DATA  TdReturnData;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   TdHob  = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
   Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
   if (EFI_ERROR (Status)) {
@@ -802,6 +826,16 @@ TdxHelperProcessTdHob (
   // Process Hoblist to accept memory
   //
   Status = ProcessHobList (TdHob);
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return Status;
 }
@@ -878,6 +912,16 @@ TdxHelperMeasureTdHob (
   OVMF_WORK_AREA        *WorkArea;
   VOID                  *TdHob;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   TdHob   = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
   Hob.Raw = (UINT8 *)TdHob;
 
@@ -912,6 +956,16 @@ TdxHelperMeasureTdHob (
   WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.MeasurementsBitmap |= TDX_MEASUREMENT_TDHOB_BITMASK;
   CopyMem (WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.TdHobHashValue, Digest, SHA384_DIGEST_SIZE);
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
+
   return EFI_SUCCESS;
 }
 
@@ -932,6 +986,14 @@ TdxHelperMeasureCfvImage (
   EFI_STATUS      Status;
   UINT8           Digest[SHA384_DIGEST_SIZE];
   OVMF_WORK_AREA  *WorkArea;
+
+  UINT64 TickStart = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
 
   Status = HashAndExtendToRtmr (
              0,
@@ -956,6 +1018,16 @@ TdxHelperMeasureCfvImage (
 
   WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.MeasurementsBitmap |= TDX_MEASUREMENT_CFVIMG_BITMASK;
   CopyMem (WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.CfvImgHashValue, Digest, SHA384_DIGEST_SIZE);
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return EFI_SUCCESS;
 }

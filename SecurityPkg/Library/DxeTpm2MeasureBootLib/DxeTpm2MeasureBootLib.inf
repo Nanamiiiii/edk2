@@ -58,6 +58,7 @@
   BaseLib
   SecurityManagementLib
   HobLib
+  TimerLib
 
 [Guids]
   gMeasuredFvHobGuid                    ## SOMETIMES_CONSUMES ## HOB

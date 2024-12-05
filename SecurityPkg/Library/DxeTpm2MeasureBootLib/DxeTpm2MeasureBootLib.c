@@ -48,6 +48,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeTpm2MeasureBootLibSanitization.h"
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 typedef struct {
   EFI_TCG2_PROTOCOL              *Tcg2Protocol;
   EFI_CC_MEASUREMENT_PROTOCOL    *CcProtocol;
@@ -645,6 +656,16 @@ DxeTpm2MeasureBootHandler (
   EFI_PHYSICAL_ADDRESS                FvAddress;
   UINT32                              Index;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   MeasureBootProtocols.Tcg2Protocol = NULL;
   MeasureBootProtocols.CcProtocol   = NULL;
 
@@ -881,6 +902,16 @@ Finish:
   }
 
   DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return Status;
 }

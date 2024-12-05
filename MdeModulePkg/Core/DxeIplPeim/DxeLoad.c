@@ -268,6 +268,16 @@ DxeLoadCore (
   EFI_MEMORY_TYPE_INFORMATION      MemoryData[EfiMaxMemoryType + 1];
   VOID                             *CapsuleOnDiskModePpi;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // if in S3 Resume, restore configure
   //
@@ -442,6 +452,16 @@ DxeLoadCore (
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_CORE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT));
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%11p EntryPoint=0x%11p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Transfer control to the DXE Core

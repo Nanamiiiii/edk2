@@ -45,6 +45,17 @@
 #include <Guid/CcEventHob.h>
 #include <Library/TdxLib.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 #define PERF_ID_CC_TCG2_DXE  0x3130
 
 #define   CC_EVENT_LOG_AREA_COUNT_MAX  1
@@ -759,6 +770,16 @@ TdGetEventLog (
 {
   UINTN  Index = 0;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   DEBUG ((DEBUG_INFO, "TdGetEventLog ... (0x%x)\n", EventLogFormat));
   ASSERT (EventLogFormat == EFI_CC_EVENT_LOG_FORMAT_TCG_2);
 
@@ -794,6 +815,16 @@ TdGetEventLog (
   // in an instance of an EFI_CONFIGURATION_TABLE named by the VendorGuid of EFI_TCG2_FINAL_EVENTS_TABLE_GUID.
   //
   mTdxDxeData.GetEventLogCalled[Index] = TRUE;
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return EFI_SUCCESS;
 }
@@ -1996,6 +2027,16 @@ MeasureAllSecureVariables (
   UINTN       DataSize;
   UINTN       Index;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   Status = EFI_NOT_FOUND;
   for (Index = 0; Index < sizeof (mVariableType)/sizeof (mVariableType[0]); Index++) {
     Status = ReadAndMeasureSecureVariable (
@@ -2028,6 +2069,16 @@ MeasureAllSecureVariables (
   } else {
     DEBUG ((DEBUG_INFO, "Skip measuring variable %s since it's deleted\n", EFI_IMAGE_SECURITY_DATABASE2));
   }
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return EFI_SUCCESS;
 }

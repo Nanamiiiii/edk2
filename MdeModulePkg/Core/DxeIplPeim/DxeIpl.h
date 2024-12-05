@@ -43,6 +43,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PerformanceLib.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000
 

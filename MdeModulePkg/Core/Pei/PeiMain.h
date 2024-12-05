@@ -52,6 +52,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MigratedFvInfo.h>
 #include <Guid/DelayedDispatch.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 ///
 /// It is an FFS type extension used for PeiFindFileEx. It indicates current
 /// FFS searching is for all PEIMs can be dispatched by PeiCore.

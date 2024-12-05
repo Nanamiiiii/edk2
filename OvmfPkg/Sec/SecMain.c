@@ -33,12 +33,26 @@
 #include <Register/Intel/Cpuid.h>
 #include "AmdSev.h"
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/DebugLib.h>
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+/* OVMFPERF-MYUU END */
+
 #define SEC_IDT_ENTRY_COUNT  34
 
 typedef struct _SEC_IDT_TABLE {
   EFI_PEI_SERVICES            *PeiService;
   IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
 } SEC_IDT_TABLE;
+
+/* OVMFPERF-MYUU BEGIN */
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
 
 VOID
 EFIAPI
@@ -798,6 +812,24 @@ SecCoreStartupWithStack (
   UINT32                Index;
   volatile UINT8        *Table;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 Freq = GetPerformanceCounterProperties (NULL, NULL);
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: ORIG: %" PRIu64 " (ticks), Freq: %" PRIu64 " KHz\n",
+    __FUNCTION__,
+    TickStart,
+    Freq
+    ));
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
  #if defined (TDX_GUEST_SUPPORTED)
   if (CcProbe () == CcGuestTypeIntelTdx) {
     //
@@ -988,6 +1020,16 @@ SecCoreStartupWithStack (
   // Initialize MTRR
   //
   SecMtrrSetup ();
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.

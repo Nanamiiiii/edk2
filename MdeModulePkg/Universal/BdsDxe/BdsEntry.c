@@ -17,6 +17,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "HwErrRecSupport.h"
 #include <Library/VariablePolicyHelperLib.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 #define SET_BOOT_OPTION_SUPPORT_KEY_COUNT(a, c)  { \
       (a) = ((a) & ~EFI_BOOT_OPTION_SUPPORT_COUNT) | (((c) << LowBitSet32 (EFI_BOOT_OPTION_SUPPORT_COUNT)) & EFI_BOOT_OPTION_SUPPORT_COUNT); \
       }
@@ -697,6 +708,16 @@ BdsEntry (
   Status          = EFI_SUCCESS;
   BootSuccess     = FALSE;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Insert the performance probe
   //
@@ -916,6 +937,16 @@ BdsEntry (
 
   PERF_INMODULE_END ("EfiBootManagerConnectAllDefaultConsoles");
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickInt = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-1: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Do the platform specific action after the console is ready
   // Possible things that can be done in PlatformBootManagerAfterConsole:
@@ -985,6 +1016,16 @@ BdsEntry (
 
   DEBUG ((DEBUG_INFO, "[Bds]=============End Load Options Dumping=============\n"));
   DEBUG_CODE_END ();
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-2: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // BootManagerMenu doesn't contain the correct information when return status is EFI_NOT_FOUND.

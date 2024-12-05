@@ -244,6 +244,16 @@ DxeMain (
   EFI_VECTOR_HANDOFF_INFO       *VectorInfo;
   VOID                          *EntryPoint;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Setup the default exception handlers
   //
@@ -255,6 +265,16 @@ DxeMain (
 
   Status = InitializeCpuExceptionHandlers (VectorInfoList);
   ASSERT_EFI_ERROR (Status);
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-1: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Setup Stack Guard
@@ -276,11 +296,31 @@ DxeMain (
 
   MemoryProfileInit (HobStart);
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-2: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Start the Handle Services.
   //
   Status = CoreInitializeHandleServices ();
   ASSERT_EFI_ERROR (Status);
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-2-1: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Start the Image Services.
@@ -288,11 +328,31 @@ DxeMain (
   Status = CoreInitializeImageServices (HobStart);
   ASSERT_EFI_ERROR (Status);
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-2-2: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Initialize the Global Coherency Domain Services
   //
   Status = CoreInitializeGcdServices (&HobStart, MemoryBaseAddress, MemoryLength);
   ASSERT_EFI_ERROR (Status);
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-2-3: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Allocate the EFI System Table and EFI Runtime Service Table from EfiRuntimeServicesData
@@ -317,6 +377,16 @@ DxeMain (
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
   PERF_CROSSMODULE_END ("PEI");
   PERF_CROSSMODULE_BEGIN ("DXE");
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-3: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Log MemoryBaseAddress and MemoryLength again (from
@@ -374,6 +444,16 @@ DxeMain (
     Status = CoreInstallConfigurationTable (&gLoadFixedAddressConfigurationTableGuid, &gLoadModuleAtFixAddressConfigurationTable);
     ASSERT_EFI_ERROR (Status);
   }
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-4: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Report Status Code here for DXE_ENTRY_POINT once it is available
@@ -466,6 +546,16 @@ DxeMain (
   CoreInitializeMemoryAttributesTable ();
   CoreInitializeMemoryProtection ();
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-5: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Get persisted vector hand-off info from GUIDeed HOB again due to HobStart may be updated,
   // and install configuration table
@@ -509,6 +599,16 @@ DxeMain (
              );
   ASSERT_EFI_ERROR (Status);
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-6: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Register for the GUIDs of the Architectural Protocols, so the rest of the
   // EFI Boot Services and EFI Runtime Services tables can be filled in.
@@ -531,15 +631,45 @@ DxeMain (
   Status = InitializeSectionExtraction (gDxeCoreImageHandle, gDxeCoreST);
   ASSERT_EFI_ERROR (Status);
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-7: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Initialize the DXE Dispatcher
   //
   CoreInitializeDispatcher ();
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-7-1: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Invoke the DXE Dispatcher
   //
   CoreDispatcher ();
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-7-2: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Display Architectural protocols that were not loaded if this is DEBUG build
@@ -555,6 +685,16 @@ DxeMain (
   DEBUG_CODE_BEGIN ();
   CoreDisplayDiscoveredNotDispatched ();
   DEBUG_CODE_END ();
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickInt = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: INT-8: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickInt
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Assert if the Architectural Protocols are not present.
@@ -579,6 +719,16 @@ DxeMain (
     EFI_PROGRESS_CODE,
     (EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT)
     );
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Transfer control to the BDS Architectural Protocol
@@ -774,6 +924,16 @@ CoreExitBootServices (
 {
   EFI_STATUS  Status;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Notify other drivers of their last chance to use boot services
   // before the memory map is terminated.
@@ -813,6 +973,16 @@ CoreExitBootServices (
     );
 
   MemoryProtectionExitBootServicesCallback ();
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Disable interrupt of Debug timer.

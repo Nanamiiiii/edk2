@@ -184,6 +184,24 @@ PeiCore (
   EFI_PEI_TEMPORARY_RAM_DONE_PPI  *TemporaryRamDonePpi;
   UINTN                           Index;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 Freq = GetPerformanceCounterProperties (NULL, NULL);
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: ORIG: %" PRIu64 " (ticks), Freq: %" PRIu64 " KHz\n",
+    __FUNCTION__,
+    TickStart,
+    Freq
+    ));
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Retrieve context passed into PEI Core
   //
@@ -548,6 +566,16 @@ PeiCore (
       );
     CpuDeadLoop ();
   }
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   //
   // Enter DxeIpl to load Dxe core.

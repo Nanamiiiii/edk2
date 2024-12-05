@@ -1860,6 +1860,16 @@ EfiBootManagerBoot (
   EFI_BOOT_LOGO_PROTOCOL     *BootLogo;
   EFI_EVENT                  LegacyBootEvent;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   if (BootOption == NULL) {
     return;
   }
@@ -1946,6 +1956,16 @@ EfiBootManagerBoot (
 
   DEBUG_CODE_END ();
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickBoot = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: BOOT-1: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickBoot
+    ));
+  /* OVMFPERF-MYUU END */
+
   ImageHandle       = NULL;
   RamDiskDevicePath = NULL;
   if (DevicePathType (BootOption->FilePath) != BBS_DEVICE_PATH) {
@@ -2003,6 +2023,16 @@ EfiBootManagerBoot (
     }
   }
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickBoot = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: BOOT-2: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickBoot
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Check to see if we should legacy BOOT. If yes then do the legacy boot
   // Write boot to OS performance data for Legacy boot
@@ -2034,6 +2064,16 @@ EfiBootManagerBoot (
     return;
   }
 
+  /* OVMFPERF-MYUU BEGIN */
+  TickBoot = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: BOOT-3: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickBoot
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Provide the image with its load options
   //
@@ -2063,6 +2103,16 @@ EfiBootManagerBoot (
     );
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderStart));
+
+  /* OVMFPERF-MYUU BEGIN */
+  TickBoot = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: BOOT-4: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickBoot
+    ));
+  /* OVMFPERF-MYUU END */
 
   Status = gBS->StartImage (ImageHandle, &BootOption->ExitDataSize, &BootOption->ExitData);
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Image Return Status = %r\n", Status));
@@ -2110,6 +2160,18 @@ EfiBootManagerBoot (
                   0,
                   NULL
                   );
+
+  /* OVMFPERF-MYUU BEGIN */
+  /* Maybe Unreachable */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: End: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
+
   //
   // Deleting variable with current variable implementation shouldn't fail.
   // When BootXXXX (e.g.: BootManagerMenu) boots BootYYYY, exiting BootYYYY causes BootCurrent deleted,

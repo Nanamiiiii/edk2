@@ -408,6 +408,16 @@ CoreDispatcher (
   BOOLEAN                ReadyToRun;
   EFI_EVENT              DxeDispatchEvent;
 
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickStart = _rdtsc ();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: START: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickStart
+    ));
+  /* OVMFPERF-MYUU END */
+
   PERF_FUNCTION_BEGIN ();
 
   if (gDispatcherRunning) {
@@ -574,6 +584,16 @@ CoreDispatcher (
   gDispatcherRunning = FALSE;
 
   PERF_FUNCTION_END ();
+
+  /* OVMFPERF-MYUU BEGIN */
+  UINT64 TickEnd = _rdtsc();
+  FORCE_DEBUG ((
+    DEBUG_INFO,
+    "## %a: OVMFPERF-MYUU: END: %" PRIu64 " (ticks)\n",
+    __FUNCTION__,
+    TickEnd
+    ));
+  /* OVMFPERF-MYUU END */
 
   return ReturnStatus;
 }

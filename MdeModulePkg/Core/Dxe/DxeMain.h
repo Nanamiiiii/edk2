@@ -86,6 +86,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/OrderedCollectionLib.h>
 
+/* OVMFPERF-MYUU BEGIN */
+#include <Library/TimerLib.h>
+#include <inttypes.h>
+
+static inline UINT64 _rdtsc() {
+   UINT32 hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ((UINT64)(lo)|((UINT64)(hi)<<32));
+}
+/* OVMFPERF-MYUU END */
+
 //
 // attributes for reserved memory before it is promoted to system memory
 //

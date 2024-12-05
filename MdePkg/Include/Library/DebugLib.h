@@ -446,6 +446,13 @@ UnitTestDebugAssert (
     } while (FALSE)
 #endif
 
+#define FORCE_DEBUG(Expression)        \
+    do {                           \
+      if (DebugPrintEnabled ()) {  \
+        _DEBUGLIB_DEBUG (Expression);       \
+      }                            \
+    } while (FALSE)
+
 /**
   Macro that calls DebugAssert() if an EFI_STATUS evaluates to an error code.
 
